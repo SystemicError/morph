@@ -35,10 +35,22 @@
     ))
 
 (deftest bounding-triangle-index-test
-  (testing "Find bounding triangle fail."
+  (testing "Bounding triangle index fail."
     (is (= (bounding-triangle-index [0.5 0.5]
                                    [[[0.0 0.0] [1.0 0.0] [0.0 1.0]]
                                    [[1.0 0.0] [1.0 1.0] [0.0 1.0]]])
            0))
 
+    ))
+
+(deftest find-interpolation-points-test
+  (testing "Find bounding triangle fail."
+    (is (= (find-interpolation-points [[[0.0 0.0] [1.0 0.0] [0.0 1.0]]
+                                       [[1.0 0.0] [1.0 1.0] [0.0 1.0]]]
+                                      [[[0.0 0.0] [4.0 0.0] [0.0 4.0]]
+                                       [[4.0 0.0] [4.0 4.0] [0.0 4.0]]]
+                                      0.5
+                                      [0.5 0.5])
+           {:before [0.2 0.2]
+            :after [0.8 0.8]}))
     ))

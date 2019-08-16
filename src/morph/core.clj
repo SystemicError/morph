@@ -76,8 +76,10 @@
   "Returns a key of the before point and the after point corresponding to this point."
   (let [triangles (interpolate-partition before-partition after-partition t)
         index (bounding-triangle-index point triangles)
-
-        ]
+        before-aff (affine-transform (nth triangles index) (nth before-partition index))
+        after-aff (affine-transform (nth triangles index) (nth after-partition index))]
+    {:before (before-aff point)
+     :after (after-aff point)}
     ))
 
 (defn -main
