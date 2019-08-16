@@ -39,9 +39,9 @@
         a2x (first a2)
         a2y (nth a2 1)
         coeffs (sv M (dge 6 1 [a0x a0y a1x a1y a2x a2y]))
-        dummy (println (str "before" before "\nb0" b0 "\nb1" b1 "\nb2" b2 "\nb0x" b0x "\nb0y" b0y "\nb1x" b1x "\nb1y" b1y "\nb2x" b2x "\nb2y" b2y
-                            "\nafter" after "\na0" a0 "\na1" a1 "\na2" a2 "\na0x" a0x "\na0y" a0y "\na1x" a1x "\na1y" a1y "\na2x" a2x "\na2y" a2y
-                            "\nM" (into [] (for [r (range 6)] (for [c (range 6)] (entry M r c))))))
+        ;dummy (println (str "before" before "\nb0" b0 "\nb1" b1 "\nb2" b2 "\nb0x" b0x "\nb0y" b0y "\nb1x" b1x "\nb1y" b1y "\nb2x" b2x "\nb2y" b2y
+        ;                    "\nafter" after "\na0" a0 "\na1" a1 "\na2" a2 "\na0x" a0x "\na0y" a0y "\na1x" a1x "\na1y" a1y "\na2x" a2x "\na2y" a2y
+        ;                    "\nM" (into [] (for [r (range 6)] (for [c (range 6)] (entry M r c))))))
         ]
     (fn [p]
       [(+ (* (entry coeffs 0 0) (first p)) (* (entry coeffs 1 0) (nth p 1)) (entry coeffs 4 0))
