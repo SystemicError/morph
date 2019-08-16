@@ -60,6 +60,13 @@
         y (nth tr-point 1)]
     (and (<= 0.0 x) (<= 0.0 y) (<= y (- 1.0 x)))))
 
+(defn interpolate-partition [before after t]
+  "Interpolates all triangles in a partition of the image."
+  (for [i (range (count before))]
+    (interpolate-anchors (nth before i)
+                         (nth after i)
+                         t)))
+
 
 
 (defn find-bounding-anchors [anchors point])
