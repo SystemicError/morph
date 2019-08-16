@@ -68,11 +68,17 @@
                          (nth after i)
                          t)))
 
-(defn find-bounding-triangle [point triangles]
-  (first (filter (partial point-in-triangle? point) triangles)))
+(defn bounding-triangle-index [point triangles]
+  (first (filter #(point-in-triangle? point (nth triangles %)) (range (count triangles)))))
 
 
-(defn interpolate-coords [before after t])
+(defn find-interpolation-points [before-partition after-partition t point]
+  "Returns a key of the before point and the after point corresponding to this point."
+  (let [triangles (interpolate-partition before-partition after-partition t)
+        index (bounding-triangle-index point triangles)
+
+        ]
+    ))
 
 (defn -main
   "I don't do a whole lot ... yet."
