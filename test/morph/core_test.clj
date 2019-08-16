@@ -21,6 +21,7 @@
   (testing "point-in-triangle? fail."
     (is (= false (point-in-triangle? [-1.0 0.0] [[1.0 1.0] [5.0 0.0] [0.0 5.0]])))
     (is (= true (point-in-triangle? [1.1 1.1] [[1.0 1.0] [5.0 0.0] [0.0 5.0]])))
+    (is (= true (point-in-triangle? [1.0 1.0] [[1.0 1.0] [5.0 0.0] [0.0 5.0]])))
     ))
 
 (deftest interpolate-partition-test

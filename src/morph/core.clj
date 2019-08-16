@@ -89,14 +89,22 @@
     ))
 
 (defn setup []
-  {:t 0
-   :before-image (q/load-image "before.jpg")
-   :after-image (q/load-image "after.jpg")
-   :before-partition [[[0 0] [256 0] [0 256]]
-                      [[256 0] [256 256] [0 256]]]
-   :after-partition [[[0 0] [256 0] [0 256]]
-                     [[256 0] [256 256] [0 256]]]
-   })
+  (let [ul [0 0]
+        ur [256 0]
+        ll [0 256]
+        lr [256 256]
+        nose0 [126 158]
+        nose1 [92 150]
+        leye0 [83 109]
+        leye1 [92 150]
+        reye0 [174 108]
+        reye1 [158 140]]
+    {:t 0
+     :before-image (q/load-image "before.jpg")
+     :after-image (q/load-image "after.jpg")
+     :before-partition (eval (read-string (slurp "before.partition.edn")))
+     :after-partition  (eval (read-string (slurp "after.partition.edn")))
+     }))
 
 (defn update-state [state]
   (assoc state
@@ -109,14 +117,21 @@
         after-image (:after-image state)
         t (:t state)
         s (- 1.0 t)
-        dummy (println (str "\t = " t))]
+        dummy (println (str "\nt = " t
+                            "\nbpar = " before-partition
+                            "\napar = " after-partition
+                            ))]
     (dotimes [x (q/width)]
       (dotimes [y (q/height)]
         (let [pts (find-interpolation-points before-partition after-partition t [x y])
               before-pt (:before pts)
+              before-x (first before-pt)
+              before-y (nth before-pt 1)
               after-pt (:after pts)
-              before-pixel (q/get-pixel before-image x y)
-              after-pixel (q/get-pixel after-image x y)
+              after-x (first after-pt)
+              after-y (nth after-pt 1)
+              before-pixel (q/get-pixel before-image before-x before-y)
+              after-pixel (q/get-pixel after-image after-x after-y)
               before-r (q/red before-pixel)
               before-g (q/green before-pixel)
               before-b (q/blue before-pixel)
