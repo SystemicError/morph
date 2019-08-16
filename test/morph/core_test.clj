@@ -33,3 +33,12 @@
            [[[0.0 0.0] [1.5 0.0] [0.0 1.5]]
             [[1.5 0.0] [1.5 1.5] [0.0 1.5]]]))
     ))
+
+(deftest find-bounding-triangle-test
+  (testing "Find bounding triangle fail."
+    (is (= (find-bounding-triangle [0.5 0.5]
+                                   [[[0.0 0.0] [1.0 0.0] [0.0 1.0]]
+                                   [[1.0 0.0] [1.0 1.0] [0.0 1.0]]])
+           [[0.0 0.0] [1.0 0.0] [0.0 1.0]]))
+
+    ))

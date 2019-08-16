@@ -5,6 +5,11 @@
             [uncomplicate.neanderthal.core :refer :all])
   (:gen-class))
 
+; We find an affine transform for each triangular region in both before and after(let corners of image be anchors to ensure every point in a region).
+; The affine transforms are functions of t.
+; Call the transform based on before picture Tb and the one based on after picture Ta.
+; For every point p in image at time t, use color(invTb(t)(p)) + color(invTa(t)(p)) for that point's color.
+
 (defn interpolate-anchors [before after t]
   "Interpolates a set of anchors parameterized with t=0 as before and t=1 as after."
   (for [i (range (count before))]
@@ -47,11 +52,6 @@
       [(+ (* (entry coeffs 0 0) (first p)) (* (entry coeffs 1 0) (nth p 1)) (entry coeffs 4 0))
        (+ (* (entry coeffs 2 0) (first p)) (* (entry coeffs 3 0) (nth p 1)) (entry coeffs 5 0))])))
 
-; We find an affine transform for each triangular region in both before and after(let corners of image be anchors to ensure every point in a region).
-; The affine transforms are functions of t.
-; Call the transform based on before picture Tb and the one based on after picture Ta.
-; For every point p in image at time t, use color(invTb(t)(p)) + color(invTa(t)(p)) for that point's color.
-
 (defn point-in-triangle? [point triangle]
   "Returns true if point is inside triangle."
   (let [aff (affine-transform triangle [[0.0 0.0] [1.0 0.0] [0.0 1.0]])
@@ -60,6 +60,7 @@
         y (nth tr-point 1)]
     (and (<= 0.0 x) (<= 0.0 y) (<= y (- 1.0 x)))))
 
+; For interpolating the entire set of triangles partitioning the image
 (defn interpolate-partition [before after t]
   "Interpolates all triangles in a partition of the image."
   (for [i (range (count before))]
@@ -67,9 +68,8 @@
                          (nth after i)
                          t)))
 
-
-
-(defn find-bounding-anchors [anchors point])
+(defn find-bounding-triangle [point triangles]
+  (first (filter (partial point-in-triangle? point) triangles)))
 
 
 (defn interpolate-coords [before after t])
