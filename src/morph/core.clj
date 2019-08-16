@@ -1,5 +1,6 @@
 (ns morph.core
-  (:require [mikera.image.core]
+  (:require [quil.core :as q]
+            [quil.middleware :as m]
             [uncomplicate.neanderthal.linalg :refer :all]
             [uncomplicate.neanderthal.native :refer :all]
             [uncomplicate.neanderthal.core :refer :all])
@@ -82,7 +83,62 @@
      :after (after-aff point)}
     ))
 
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (println "Hello, World!"))
+(defn interpolate-images [before-image after-image before-partition after-partition t]
+  "Returns an image interpolated from the given images using the given partitions at the given t."
+  (let [inter-image (q/create-image (q/width) (q/height) :rgb)]
+    ))
+
+(defn setup []
+  {:t 0
+   :before-image (q/load-image "before.jpg")
+   :after-image (q/load-image "after.jpg")
+   :before-partition [[[0 0] [256 0] [0 256]]
+                      [[256 0] [256 256] [0 256]]]
+   :after-partition [[[0 0] [256 0] [0 256]]
+                     [[256 0] [256 256] [0 256]]]
+   })
+
+(defn update-state [state]
+  (assoc state
+         :t (+ (:t state) 0.1)))
+
+(defn draw-state [state]
+  (let [before-partition (:before-partition state)
+        after-partition (:after-partition state)
+        before-image (:before-image state)
+        after-image (:after-image state)
+        t (:t state)
+        s (- 1.0 t)
+        dummy (println (str "\t = " t))]
+    (dotimes [x (q/width)]
+      (dotimes [y (q/height)]
+        (let [pts (find-interpolation-points before-partition after-partition t [x y])
+              before-pt (:before pts)
+              after-pt (:after pts)
+              before-pixel (q/get-pixel before-image x y)
+              after-pixel (q/get-pixel after-image x y)
+              before-r (q/red before-pixel)
+              before-g (q/green before-pixel)
+              before-b (q/blue before-pixel)
+              after-r (q/red after-pixel)
+              after-g (q/green after-pixel)
+              after-b (q/blue after-pixel)
+              pixel (q/color (+ (* s before-r) (* t after-r))
+                             (+ (* s before-g) (* t after-g))
+                             (+ (* s before-b) (* t after-b)))
+              ]
+          (q/set-pixel x y pixel))))
+  ))
+
+(q/defsketch morph
+  :title "Morph"
+  :size [256 256]
+  ; setup function called only once, during sketch initialization.
+  :setup setup
+  ; update-state is called on each iteration before draw-state.
+  :update update-state
+  :draw draw-state
+  ; This sketch uses functional-mode middleware.
+  ; Check quil wiki for more info about middlewares and particularly
+  ; fun-mode.
+  :middleware [m/fun-mode])
