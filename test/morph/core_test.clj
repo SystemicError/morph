@@ -16,3 +16,9 @@
     (is (= ((affine-transform [[0.0 0.0] [1.0 0.0] [0.0 1.0]] [[0.0 0.0] [1.0 0.0] [0.0 2.0]]) [3.0 3.0]) [3.0 6.0]))
     (is (= ((affine-transform [[0.0 0.0] [1.0 0.0] [0.0 1.0]] [[0.0 0.0] [0.0 -1.0] [1.0 0.0]]) [3.0 3.0]) [3.0 -3.0]))
     ))
+
+(deftest point-in-triangle?-test
+  (testing "point-in-triangle? fail."
+    (is (= false (point-in-triangle? [-1.0 0.0] [[1.0 1.0] [5.0 0.0] [0.0 5.0]])))
+    (is (= true (point-in-triangle? [1.1 1.1] [[1.0 1.0] [5.0 0.0] [0.0 5.0]])))
+    ))

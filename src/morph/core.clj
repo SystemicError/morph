@@ -52,6 +52,14 @@
 ; Call the transform based on before picture Tb and the one based on after picture Ta.
 ; For every point p in image at time t, use color(invTb(t)(p)) + color(invTa(t)(p)) for that point's color.
 
+(defn point-in-triangle? [point triangle]
+  "Returns true if point is inside triangle."
+  (let [aff (affine-transform triangle [[0.0 0.0] [1.0 0.0] [0.0 1.0]])
+        tr-point (aff point)
+        x (first tr-point)
+        y (nth tr-point 1)]
+    (and (<= 0.0 x) (<= 0.0 y) (<= y (- 1.0 x)))))
+
 
 
 (defn find-bounding-anchors [anchors point])
