@@ -103,11 +103,6 @@
     {:before (before-aff point)
      :after (after-aff point)}))
 
-(defn interpolate-images [before-image after-image before-partition after-partition t]
-  "Returns an image interpolated from the given images using the given partitions at the given t."
-  (let [inter-image (q/create-image (q/width) (q/height) :rgb)]
-    ))
-
 (defn setup []
   (q/frame-rate 30) ; haha
   {:t 0
@@ -118,7 +113,7 @@
 
 (defn update-state [state]
   (assoc state
-         :t (+ (:t state) (Math/pow 2 -4))))
+         :t (+ (:t state) (Math/pow 2 -7))))
 
 (defn draw-state [state]
   (let [before-partition (:before-partition state)
