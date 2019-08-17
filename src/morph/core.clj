@@ -77,11 +77,13 @@
   "Returns a key of the before point and the after point corresponding to this point."
   (let [triangles (interpolate-partition before-partition after-partition t)
         index (bounding-triangle-index point triangles)
+        dummy (if (not index) (println (str "Null index at:"
+                                            "\ntriangles = " (into [] triangles)
+                                            "\npoint = " point)))
         before-aff (affine-transform (nth triangles index) (nth before-partition index))
         after-aff (affine-transform (nth triangles index) (nth after-partition index))]
     {:before (before-aff point)
-     :after (after-aff point)}
-    ))
+     :after (after-aff point)}))
 
 (defn interpolate-images [before-image after-image before-partition after-partition t]
   "Returns an image interpolated from the given images using the given partitions at the given t."
@@ -89,26 +91,16 @@
     ))
 
 (defn setup []
-  (let [ul [0 0]
-        ur [256 0]
-        ll [0 256]
-        lr [256 256]
-        nose0 [126 158]
-        nose1 [92 150]
-        leye0 [83 109]
-        leye1 [92 150]
-        reye0 [174 108]
-        reye1 [158 140]]
-    {:t 0
-     :before-image (q/load-image "before.jpg")
-     :after-image (q/load-image "after.jpg")
-     :before-partition (eval (read-string (slurp "before.partition.edn")))
-     :after-partition  (eval (read-string (slurp "after.partition.edn")))
-     }))
+  (q/frame-rate 30) ; haha
+  {:t 0
+   :before-image (q/load-image "before.jpg")
+   :after-image (q/load-image "after.jpg")
+   :before-partition (eval (read-string (slurp "before.partition.edn")))
+   :after-partition  (eval (read-string (slurp "after.partition.edn")))})
 
 (defn update-state [state]
   (assoc state
-         :t (+ (:t state) 0.1)))
+         :t (+ (:t state) 0.00390625)))
 
 (defn draw-state [state]
   (let [before-partition (:before-partition state)
@@ -117,13 +109,12 @@
         after-image (:after-image state)
         t (:t state)
         s (- 1.0 t)
-        dummy (println (str "\nt = " t
-                            "\nbpar = " before-partition
-                            "\napar = " after-partition
-                            ))]
-    (dotimes [x (q/width)]
-      (dotimes [y (q/height)]
-        (let [pts (find-interpolation-points before-partition after-partition t [x y])
+        dummy (println (str "\nt = " t))]
+    (dotimes [i (- (q/width) 2)]
+      (dotimes [j (- (q/height) 2)]
+        (let [x (inc i)
+              y (inc j)
+              pts (find-interpolation-points before-partition after-partition t [x y])
               before-pt (:before pts)
               before-x (first before-pt)
               before-y (nth before-pt 1)
@@ -143,11 +134,12 @@
                              (+ (* s before-b) (* t after-b)))
               ]
           (q/set-pixel x y pixel))))
+    (q/save-frame "morph-####.jpg")
   ))
 
 (q/defsketch morph
   :title "Morph"
-  :size [256 256]
+  :size [100 133]
   ; setup function called only once, during sketch initialization.
   :setup setup
   ; update-state is called on each iteration before draw-state.
