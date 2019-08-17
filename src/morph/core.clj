@@ -61,6 +61,11 @@
         y (nth tr-point 1)]
     (and (<= 0.0 x) (<= 0.0 y) (<= y (- 1.0 x)))))
 
+(defn distance-from-triangle [point triangle]
+  "Returns the sum of the distances between a point and each vertex."
+  (let [dist-fn (fn [u v] (reduce + (map #(* % %) (map - u v))))]
+    (reduce + (map (partial dist-fn point) triangle))))
+
 ; For interpolating the entire set of triangles partitioning the image
 (defn interpolate-partition [before after t]
   "Interpolates all triangles in a partition of the image."
@@ -70,16 +75,29 @@
                          t)))
 
 (defn bounding-triangle-index [point triangles]
-  (first (filter #(point-in-triangle? point (nth triangles %)) (range (count triangles)))))
+  (let[filtered (filter #(point-in-triangle? point (nth triangles %)) (range (count triangles)))
+       distances (map (partial distance-from-triangle point) triangles)
+       min-dist (reduce min distances)
+       mindex (first (filter #(= min-dist (nth distances %)) (range (count distances))))
+       dummy (if (empty? filtered)
+               (println (str "Failed to find bounding triangle, using best guess of nearest triangle:"
+                             "\ntriangles = " (into [] triangles)
+                             "\npoint = " point
+                             ;"\nfiltered = " (into [] filtered)
+                             ;"\ndistances = " (into [] distances)
+                             "\nmin-dist = " min-dist
+                             "\nmindex = " mindex)))
+       ]
+    (if (not (empty? filtered))
+      (first filtered)
+      ; pick the one "nearest" to us
+      mindex)))
 
 
 (defn find-interpolation-points [before-partition after-partition t point]
   "Returns a key of the before point and the after point corresponding to this point."
   (let [triangles (interpolate-partition before-partition after-partition t)
         index (bounding-triangle-index point triangles)
-        dummy (if (not index) (println (str "Null index at:"
-                                            "\ntriangles = " (into [] triangles)
-                                            "\npoint = " point)))
         before-aff (affine-transform (nth triangles index) (nth before-partition index))
         after-aff (affine-transform (nth triangles index) (nth after-partition index))]
     {:before (before-aff point)
@@ -100,7 +118,7 @@
 
 (defn update-state [state]
   (assoc state
-         :t (+ (:t state) 0.00390625)))
+         :t (+ (:t state) (Math/pow 2 -4))))
 
 (defn draw-state [state]
   (let [before-partition (:before-partition state)
@@ -110,11 +128,9 @@
         t (:t state)
         s (- 1.0 t)
         dummy (println (str "\nt = " t))]
-    (dotimes [i (- (q/width) 2)]
-      (dotimes [j (- (q/height) 2)]
-        (let [x (inc i)
-              y (inc j)
-              pts (find-interpolation-points before-partition after-partition t [x y])
+    (dotimes [x (q/width)]
+      (dotimes [y (q/height)]
+        (let [pts (find-interpolation-points before-partition after-partition t [x y])
               before-pt (:before pts)
               before-x (first before-pt)
               before-y (nth before-pt 1)
@@ -139,7 +155,7 @@
 
 (q/defsketch morph
   :title "Morph"
-  :size [100 133]
+  :size [300 259]
   ; setup function called only once, during sketch initialization.
   :setup setup
   ; update-state is called on each iteration before draw-state.

@@ -22,7 +22,12 @@
     (is (= false (point-in-triangle? [-1.0 0.0] [[1.0 1.0] [5.0 0.0] [0.0 5.0]])))
     (is (= true (point-in-triangle? [1.1 1.1] [[1.0 1.0] [5.0 0.0] [0.0 5.0]])))
     (is (= true (point-in-triangle? [1.0 1.0] [[1.0 1.0] [5.0 0.0] [0.0 5.0]])))
-    (is (= true (point-in-triangle? [0.0 2.0]  [[29.0 48.0] [0.0 0.0] [0.0 67.0]])))
+    ;(is (= true (point-in-triangle? [0.0 2.0]  [[29.0 48.0] [0.0 0.0] [0.0 67.0]])))
+    ))
+
+(deftest distance-from-triangle-test
+  (testing "distance-from-triangle fail."
+    (is (= 30.0 (distance-from-triangle [-1.0 0.0] [[0.0 0.0] [1.0 0.0] [2.0 4.0]])))
     ))
 
 (deftest interpolate-partition-test
