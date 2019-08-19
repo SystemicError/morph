@@ -103,6 +103,24 @@
     {:before (before-aff point)
      :after (after-aff point)}))
 
+(defn smooth-get-pixel [image x y]
+  "Gets the color at a fractional location using weights of nearest neighbors."
+  (let [t (- x (int x))
+        s (- y (int y))
+        a (q/get-pixel image x y)
+        b (q/get-pixel image (inc x) y)
+        c (q/get-pixel image x (inc y))
+        d (q/get-pixel image (inc x) (inc y))
+        channels (for [q [a b c d]] [(q/red q) (q/green q) (q/blue q)])
+        weights [(* (- 1.0 t) (- 1.0 s))
+                 (* t (- 1.0 s))
+                 (* (- 1.0 t) s)
+                 (* t s)]
+        rgb (map (fn [channel weight] (map #(* weight %) channel)) channels weights)
+        sum (for [i (range 3)] (reduce + (map #(nth % i) rgb)))
+        ]
+    (q/color (first sum) (second sum) (nth sum 2))))
+
 (defn setup []
   (q/frame-rate 30) ; haha
   {:t 0
@@ -132,8 +150,8 @@
               after-pt (:after pts)
               after-x (first after-pt)
               after-y (nth after-pt 1)
-              before-pixel (q/get-pixel before-image before-x before-y)
-              after-pixel (q/get-pixel after-image after-x after-y)
+              before-pixel (smooth-get-pixel before-image before-x before-y)
+              after-pixel (smooth-get-pixel after-image after-x after-y)
               before-r (q/red before-pixel)
               before-g (q/green before-pixel)
               before-b (q/blue before-pixel)
